@@ -23,60 +23,51 @@ const Fetch = () => {
       );
 
       setBooks(response.data);
+
       response.data.sort(function compare(a, b) {
         return new Date(b.released) - new Date(a.released);
       });
     } catch (error) {
-      setError(error);
+      setError(error.message);
     }
     setIsLoading(false);
   };
 
-  const sortArray = (sortingType) => {
-    if (sortingType === "asc") {
-      let sorted = [...books].sort((a, b) => {
-        if (new Date(a.released).getTime() > new Date(b.released).getTime())
-          return 1;
-        else return -1;
-      });
+  const ascHandler = () => {
+    let sorted = [...books].sort((a, b) => {
+      return new Date(a.released) - new Date(b.released);
+    });
+    setBooks(sorted);
+  };
 
-      setBooks(sorted);
-    }
-    if (sortingType === "dsc") {
-      let sorted = [...books].sort((a, b) => {
-        if (new Date(b.released).getTime() > new Date(a.released).getTime())
-          return 1;
-        else return -1;
-      });
-
-      setBooks(sorted);
-    }
+  const dscHandler = () => {
+    let sorted = [...books].sort((a, b) => {
+      return new Date(b.released) - new Date(a.released);
+    });
+    setBooks(sorted);
   };
 
   return (
     <div className="App">
       <div>
         <button className="button" onClick={fetchData} disabled={isLoading}>
-          {isLoading && <FaSpinner icon="spinner" className="spinner" />}
-          {!isLoading && <span>Fetch Data</span>}
+          {isLoading ? (<FaSpinner icon="spinner" className="spinner" />) : (<span>Fetch Data</span>)}
         </button>
       </div>
       <div className="sort">
-        <button className="sortA" onClick={() => sortArray("dsc")}>↑</button>
-        <button className="sortD" onClick={() => sortArray("asc")}>↓</button>
+        <button className="sortA" onClick={ascHandler}>↑</button>
+        <button className="sortD" onClick={dscHandler}>↓</button>
       </div>
-      {error && (
-        <div className="error">Error 404: Not Found</div>
-      )}
+      {error && <div className="error">{error}</div>}
       <div className="books">
         {books &&
           books.map((book, index) => {
             const cleanedDate = new Date(book.released).toDateString();
             const authors = book.authors.join(", ");
-
+            const bookNumber = index;
             return (
               <div className="book" key={index}>
-                <h3>Book {++index}</h3>
+                <h3>Book {bookNumber + 1}</h3>
                 <h2>{book.name}</h2>
                 <div className="details">
                   <p>
